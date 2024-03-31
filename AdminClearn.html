@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear Index</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 25px;
+            background-color: #800000;
+            color: #fff;
+            border: none;
+            border-radius: 11px;
+            cursor: pointer;
+            transition: transform 0.7s ease;
+}
+
+button:hover {
+    transform: scale(1.15);
+}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="clearButton">Clear All uploads File</button>
+        <h1 id="by">By Zexus </h1>
+    </div>
+
+    <script>
+        document.getElementById('clearButton').addEventListener('click', function() {
+            localStorage.removeItem('fileList');
+            document.getElementById('fileList').innerHTML = '';
+            alert('Index cleared successfully!');
+        });
+    </script>
+</body>
+</html>

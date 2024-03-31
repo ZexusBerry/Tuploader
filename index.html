@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Upload</title>
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+}
+
+.header {
+    background-color: #800000;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #800000;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+input[type='file'] {
+    display: none;
+}
+
+.file-upload {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #f00a0a;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.5s ease;
+}
+
+.file-upload:hover {
+    background-color: #cc0000;
+}
+
+.file-input {
+    margin-top: 10px;
+}
+
+.file-preview {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.file-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 5px;
+}
+
+.file-info {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.file-list {
+}
+
+.file-item {
+    position: relative;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #990000;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.3s ease;
+}
+
+.file-item:hover {
+}
+
+.file-name {
+    flex-grow: 1;
+    margin-right: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #fff;
+    cursor: pointer;
+}
+
+.file-info-container {
+    display: none;
+    position: absolute;
+    top: 30px;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    z-index: 1;
+}
+
+.options {
+    display: inline-block;
+    cursor: pointer;
+    color: #ff3333;
+    font-size: 24px;
+}
+
+.options:hover {
+    color: #cc0000;
+}
+
+.description {
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.file-description {
+    border-bottom: 1px solid #fff;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.exe-preview,
+.png-preview,
+.jpeg-preview,
+.gif-preview {
+    max-width: 100px;
+}
+
+         #avatar {
+            position: absolute;
+            top: 20px;
+            left: 1280px;
+            width: 50px;
+            height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #fff;
+    transition: transform 0.3s ease;
+}
+
+#fileName {
+    padding: 9px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    width: 195px;
+}
+
+#screenshotInput {
+    padding: 9px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+#fileDescription {
+    padding: 9px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 15px;
+    margin-bottom: 10px;
+    width: 195px;
+}
+
+#avatar:hover {
+    transform: rotate(360deg);
+}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>|-    T Uploader    -|</h1>
+    </div>
+    <div class="container">
+        <img id="avatar" src="Avatar.png" alt="Avatar">
+        <input type="file" id="fileInput" accept="*">
+        <label for="fileInput" class="file-upload">Select File</label>
+        <div class="file-input" id="fileNameInput">
+            <input type="text" id="fileName" placeholder="Enter file name">
+            <input type="file" id="screenshotInput" accept="image/*" class="screenshot-input">
+            <input id="fileDescription" class="description-input" placeholder="Enter file description"></input>
+<button onclick="saveToCloud()" style="
+    background: linear-gradient(135deg, #7E2E84, #2E8B57);
+    color: #fff;
+    padding: 13px 15px;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, opacity 0.2s;
+">
+    Save to Cloud
+</button>
+        </div>
+        <div class="file-preview" id="filePreview"></div>
+        <div class="file-info" id="fileInfo"></div>
+        <div class="file-list" id="fileList"></div>
+    </div>
+
+    <script>
+        function saveToCloud() {
+            var fileName = document.getElementById('fileName').value;
+            var file = document.getElementById('fileInput').files[0];
+            var fileDescription = document.getElementById('fileDescription').value;
+            var screenshot = document.getElementById('screenshotInput').files[0];
+
+            // Добавляем расширение файла, если не указано пользователем
+            if (fileName && file) {
+                var fileExtension = file.name.split('.').pop();
+                if (!fileName.toLowerCase().endsWith(fileExtension.toLowerCase())) {
+                    fileName += '.' + fileExtension;
+                }
+            }
+
+            if (fileName && file) {
+                var fileReader = new FileReader();
+
+                fileReader.onload = function(e) {
+                    var fileData = e.target.result;
+                    var screenshotData = '';
+
+                    if (screenshot) {
+                        var screenshotReader = new FileReader();
+                        screenshotReader.onload = function(e) {
+                            screenshotData = e.target.result;
+                        };
+                        screenshotReader.readAsDataURL(screenshot);
+                    }
+
+                    var fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <div class="file-name" onclick="showFileInfo(this)">${fileName}</div>
+                        <div class="options" onclick="showDetails(this)">View</div>
+                        <div class="file-info-container">
+                            <div class="description">
+                                <div class="file-description">
+                                    <strong>File Name:</strong> ${fileName}
+                                </div>
+                                <div class="file-description">
+                                    <strong>File Description:</strong> ${fileDescription}
+                                </div>
+                            </div>
+                            <img src="${getTypePreview(file.name)}" class="${getTypeClass(file.name)}">
+                            <img src="${screenshotData}" style="max-width: 100px; max-height: 100px;">
+                            <button onclick="downloadFile('${fileName}', '${fileData}')">Download</button>
+                        </div>`;
+
+                    document.getElementById('fileList').appendChild(fileItem);
+
+                    localStorage.setItem('fileList', document.getElementById('fileList').innerHTML);
+
+                    alert('File saved to cloud successfully!');
+                };
+
+                fileReader.readAsDataURL(file);
+            } else {
+                alert('Please select a file and enter a file name before saving to cloud.');
+            }
+        }
+
+        function downloadFile(fileName, fileData) {
+            var link = document.createElement('a');
+            link.href = fileData;
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function showFileInfo(element) {
+            var infoContainer = element.nextElementSibling;
+            if (infoContainer.style.display === 'block') {
+                infoContainer.style.display = 'none';
+            } else {
+                infoContainer.style.display = 'block';
+            }
+        }
+
+        function showDetails(element) {
+            var infoContainer = element.nextElementSibling;
+            if (infoContainer.style.display === 'block') {
+                infoContainer.style.display = 'none';
+            } else {
+                infoContainer.style.display = 'block';
+            }
+        }
+
+        function getTypePreview(fileName) {
+            var fileType = fileName.split('.').pop().toLowerCase();
+            if (fileType === 'exe') {
+                return 'windows_exe.jpg'; // Placeholder image for exe files
+            } else if (fileType === 'png' || fileType === 'jpeg' || fileType === 'jpg' || fileType === 'gif') {
+                return 'windows_image.jpg'; // Placeholder image for image files
+            } else {
+                return '';
+            }
+        }
+
+        function getTypeClass(fileName) {
+            var fileType = fileName.split('.').pop().toLowerCase();
+            if (fileType === 'exe') {
+                return 'exe-preview';
+            } else if (fileType === 'png') {
+                return 'png-preview';
+            } else if (fileType === 'jpeg' || fileType === 'jpg') {
+                return 'jpeg-preview';
+            } else if (fileType === 'gif') {
+                return 'gif-preview';
+            } else {
+                return '';
+            }
+        }
+
+        document.getElementById('fileList').innerHTML = localStorage.getItem('fileList');
+    </script>
+</body>
+</html>
